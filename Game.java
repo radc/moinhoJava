@@ -32,6 +32,8 @@ public abstract class Game {
         espacoSelec[1] = -1;
         espacoSelec[2] = -1;
         jaSelecionado = false;
+        
+        FrameManager.escreveQuemJoga(Player.NONE);
     }
     
     public static void resetGame(){
@@ -43,6 +45,8 @@ public abstract class Game {
         espacoSelec[1] = -1;
         espacoSelec[2] = -1;
         jaSelecionado = false;
+        
+        FrameManager.escreveQuemJoga(Player.NONE);
     }
     
     public static void setJogadores (TipoJogadores tipo){
@@ -55,7 +59,7 @@ public abstract class Game {
             quemJoga = Player.PLAYER_A;
             
             FrameManager.escreveMensagem("Player_A Começa");
-            
+            FrameManager.escreveQuemJoga(Player.PLAYER_A);
             
         }else{
             System.out.println("Tipo de Jogo ainda não suportado");
@@ -65,7 +69,7 @@ public abstract class Game {
     
     
     public static void botaoPressionado(int i, int j, int k){
-        
+        Jogador playerAtual = quemJoga == Player.PLAYER_A ? playerA : playerB;
         tabuleiro.getEspaco(i, j, k).getjButtonAssociado().setEnabled(false);
         
         if (turno == Turno.REMOCAO_PECAS){
@@ -78,7 +82,12 @@ public abstract class Game {
             if (!jaSelecionado){
                 selecionaPeca(i,j,k);
             }else{
-                deslocaPeca(i,j,k);
+                if (playerAtual.getNumeroPecas() > 3){
+                    deslocaPeca(i,j,k);
+                }else{
+                    teletransportaPeca(i,j,k);
+                }
+                
             }
         }
         
@@ -98,9 +107,11 @@ public abstract class Game {
         if (quemJoga == Player.PLAYER_A){
             quemJoga = Player.PLAYER_B;
             FrameManager.escreveMensagem("Player B "+jogada);
+            FrameManager.escreveQuemJoga(Player.PLAYER_B);
         }else{
             quemJoga = Player.PLAYER_A;
             FrameManager.escreveMensagem("Player A "+jogada);
+            FrameManager.escreveQuemJoga(Player.PLAYER_A);
         }
     }
     
@@ -121,6 +132,13 @@ public abstract class Game {
             return;
         }
         
+        if (verificaMoinhoAdversario(i,j,k)){
+            if (haPecasLivresAdversario()){
+                FrameManager.escreveMensagem("Nao pode desmanchar moinho adversario!");
+                return;
+            }
+        }
+        
         try {
             
             escolhido.removePeca();
@@ -136,6 +154,26 @@ public abstract class Game {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    private static boolean haPecasLivresAdversario (){
+        Player adversario = quemJoga == Player.PLAYER_A ? Player.PLAYER_B : Player.PLAYER_A;
+        
+        for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
+                for (int k = 0; k < 3; k++){
+                    if (j != 1 || k != 1){
+                        if (tabuleiro.getEspaco(i, j, k).getPeca() == adversario){
+                            if(!verificaMoinhoAdversario(i,j,k)){
+                                return true;
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     private static void inserePeca (int i, int j, int k){
@@ -202,6 +240,50 @@ public abstract class Game {
             int counter = 0;
             while (counter < 3){
                 if (tabuleiro.getEspaco(i, j, counter).getPeca() != quemJoga){
+                    break;
+                }
+                counter++;
+            }
+            if (counter == 3) return true;
+        }
+        return false;
+    }
+    
+    private static boolean verificaMoinhoAdversario (int i, int j, int k){
+        Player adversario = quemJoga == Player.PLAYER_A ? Player.PLAYER_B : Player.PLAYER_A;
+
+        
+        if (j == 1 && k == 1){
+            System.out.println("ERRO DE ACESSO (X-1-1)");
+            return false;
+        }
+        
+        if (j == 1 || k == 1){
+            int counter = 0;
+            while (counter < 3){
+                if (tabuleiro.getEspaco(counter, j, k).getPeca() != adversario){
+                    break;
+                }
+                counter++;
+            }
+            if (counter == 3) return true;
+        }
+        
+        if (k != 1){
+            int counter = 0;
+            while (counter < 3){
+                if (tabuleiro.getEspaco(i, counter, k).getPeca() != adversario){
+                    break;
+                }
+                counter++;
+            }
+            if (counter == 3) return true;
+        }
+        
+        if (j != 1){
+            int counter = 0;
+            while (counter < 3){
+                if (tabuleiro.getEspaco(i, j, counter).getPeca() != adversario){
                     break;
                 }
                 counter++;
@@ -313,6 +395,42 @@ public abstract class Game {
             }
         }
         
+        
+        
+    }
+    
+    private static void teletransportaPeca(int i, int j, int k){
+        Espaco selecAgora;
+        Espaco selecAntes;
+        selecAgora = tabuleiro.getEspaco(i, j, k);
+        selecAntes = tabuleiro.getEspaco(espacoSelec[0],espacoSelec[1], espacoSelec[2]);
+        if (i == espacoSelec[0] && j == espacoSelec[1] && k == espacoSelec[2]){
+            try {
+                selecAgora.desseleciona();
+                jaSelecionado = false;
+                return;
+            } catch (Exception ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        if (selecAgora.getPeca() != Player.NONE){
+            FrameManager.escreveMensagem("Selecione uma posicao valida!");
+            return;
+        }
+        
+        try {
+            selecAgora.setPeca(quemJoga);
+            selecAntes.removePeca();
+            jaSelecionado = false;
+            if(verificaMoinho(i,j,k)){
+                remocao();
+            }else{
+                passaVez();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
     }

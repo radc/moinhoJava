@@ -5,6 +5,8 @@
  */
 package moinhomultiplayer;
 
+import java.awt.Color;
+
 /**
  *
  * @author Ruhan Conceição
@@ -35,5 +37,19 @@ public abstract class FrameManager {
         mainFrame.getMensagensLabel().setText(s);
         
         
+    }
+    
+    public static void escreveQuemJoga (Player player){
+        if (player == Player.PLAYER_A){
+            mainFrame.getQuemJoga().setText("A");
+            mainFrame.getQuemJoga().setForeground(Color.red);
+        }else if (player == Player.PLAYER_B){
+            mainFrame.getQuemJoga().setText("B");
+            mainFrame.getQuemJoga().setForeground(Color.cyan);
+            
+        }else{
+            mainFrame.getQuemJoga().setText("");
+            mainFrame.getQuemJoga().setForeground(Color.white);
+        }
     }
 }

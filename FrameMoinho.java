@@ -21,6 +21,12 @@ public class FrameMoinho extends javax.swing.JFrame {
         initComponents();
     }
 
+    public JLabel getQuemJoga() {
+        return quemJoga;
+    }
+
+    
+    
     public JLabel getMensagensLabel() {
         return jLabel_Mensagens;
     }
@@ -186,12 +192,12 @@ public class FrameMoinho extends javax.swing.JFrame {
         jLabelF = new javax.swing.JLabel();
         jLabelG = new javax.swing.JLabel();
         jLabel_Mensagens = new javax.swing.JLabel();
+        quemJoga = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(647, 487));
         setResizable(false);
-        setSize(new java.awt.Dimension(647, 487));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jButtonPCvsPC.setText("PC vs PC");
@@ -487,6 +493,11 @@ public class FrameMoinho extends javax.swing.JFrame {
         jLabel_Mensagens.setText("Mensagens");
         getContentPane().add(jLabel_Mensagens, new org.netbeans.lib.awtextra.AbsoluteConstraints(495, 161, 140, -1));
 
+        quemJoga.setBackground(new java.awt.Color(255, 255, 255));
+        quemJoga.setText("A");
+        quemJoga.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(quemJoga, new org.netbeans.lib.awtextra.AbsoluteConstraints(163, 300, 10, -1));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/moinhomultiplayer/Imagem1-Reduzido.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
@@ -677,5 +688,6 @@ public class FrameMoinho extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelN6;
     private javax.swing.JLabel jLabelN7;
     private javax.swing.JLabel jLabel_Mensagens;
+    private javax.swing.JLabel quemJoga;
     // End of variables declaration//GEN-END:variables
 }
